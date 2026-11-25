@@ -13,7 +13,7 @@ intents.message_content = True
 
 token = BOT_TOKEN # Discord Bot Token
 
-current_bot_host = "Rusty"
+current_bot_host = "iRustedzz"
 
 bot = commands.Bot(
     command_prefix="!",
