@@ -1,101 +1,47 @@
-import discord 
-from discord.ext import commands
+
+import discord
 from discord import app_commands
-from discord.ext import tasks
-from bot_config import bot, intents
+from bot_config import bot
+
+import traceback
+import io
 
 
-@bot.tree.error
-async def on_app_command_error(
-    interaction: discord.Interaction,
-    error: app_commands.AppCommandError
-):
-    import traceback
-    import io
-
-    tb = "".join(
-        traceback.format_exception(
-            type(error),
-            error,
-            error.__traceback__
-        )
-    )
-
-    file = discord.File(
-        io.BytesIO(tb.encode("utf-8")),
-        filename="traceback.txt"
-    )
-
-    message = (
-        f"❌ **Command failed**\n"
-        f"Error: `{type(error).__name__}`"
-    )
-
-    try:
-        if interaction.response.is_done():
-            await interaction.followup.send(
-                message,
-                file=file
-            )
-        else:
-            await interaction.response.send_message(
-                message,
-                file=file
-            )
-
-    except discord.NotFound:
-        # Interaction expired before we could respond.
-        print("Interaction expired before the error message could be sent.")
-        print(tb)
-
-    except discord.HTTPException as e:
-        print(f"Failed to send error message: {e}")
-        print(tb)
+# =====================================================
+# APPLICATION COMMAND ERROR HANDLING
+# =====================================================
 
 @bot.tree.error
 async def on_app_command_error(
     interaction: discord.Interaction,
     error: app_commands.AppCommandError
 ):
-    import traceback
-    import io
+    original_error = getattr(error, "original", error)
 
-    tb = "".join(
+    traceback_text = "".join(
         traceback.format_exception(
-            type(error),
-            error,
-            error.__traceback__
+            type(original_error),
+            original_error,
+            original_error.__traceback__
         )
     )
 
-    file = discord.File(
-        io.BytesIO(tb.encode("utf-8")),
-        filename="traceback.txt"
-    )
+    # Log the full traceback locally
+    print(traceback_text)
 
     message = (
-        f"❌ **Command failed**\n"
-        f"Error: `{type(error).__name__}`"
+        "❌ **Command failed**\n"
+        f"Error: `{type(original_error).__name__}`"
     )
 
     try:
         if interaction.response.is_done():
-            await interaction.followup.send(
-                message,
-                file=file
-            )
+            await interaction.followup.send(message)
         else:
-            await interaction.response.send_message(
-                message,
-                file=file
-            )
+            await interaction.response.send_message(message)
 
     except discord.NotFound:
-        # Interaction expired before we could respond.
         print("Interaction expired before the error message could be sent.")
-        print(tb)
 
     except discord.HTTPException as e:
         print(f"Failed to send error message: {e}")
-        print(tb)
-#def build_message_embed(data) -> discord.Embed:

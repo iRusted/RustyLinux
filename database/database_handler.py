@@ -34,3 +34,20 @@ def add_user(discord_id, username):
 
     finally:
         db.close()
+        
+def get_user(discord_id):
+    db = get_database_connection()
+
+    try:
+        cursor = db.cursor()
+
+        cursor.execute("""
+            SELECT user_id, username, home_dir, paid
+            FROM users
+            WHERE discord_id = ?
+        """, (str(discord_id),))
+
+        return cursor.fetchone()
+
+    finally:
+        db.close()
