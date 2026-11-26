@@ -1,19 +1,24 @@
 import discord
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 from discord.ext import commands
-from discord import app_commands
-from discord.ext import tasks
 
-load_dotenv()
-BOT_TOKEN = os.getenv("BOT_TOKEN")
+ENV_PATH = Path(__file__).resolve().parent / ".env"
+load_dotenv(ENV_PATH)
+
+def get_token():
+    return os.getenv("BOT_TOKEN")
 
 intents = discord.Intents.default()
 intents.message_content = True
 
-token = BOT_TOKEN # Discord Bot Token
+token = get_token()
 
-current_bot_host = "iRustedzz" # Change if self hosting
+if not token:
+    raise RuntimeError("BOT_TOKEN could not be loaded!")
+
+current_bot_host = "iRustedzz"
 
 bot = commands.Bot(
     command_prefix="!",
