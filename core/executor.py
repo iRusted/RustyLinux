@@ -1,14 +1,12 @@
 import subprocess
 import shlex
 
-username = "rustylinuxtest"
+def run_command(command: str):
+    result = subprocess.run(
+        shlex.split(command),
+        capture_output=True,
+        text=True,
+        timeout=30
+    )
 
-command = input("What command do you wish to run > ")
-
-result = subprocess.run(
-    ["runuser", "-u", username, "--", *command],
-    capture_output=True,
-    text=True
-)
-
-print(result.stdout)
+    return result
