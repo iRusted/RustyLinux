@@ -1,7 +1,10 @@
 import subprocess 
 
+command = input("What Command do you wish to run >")
+
+
 result = subprocess.run(
-    ["whoami"],
+    [f"{command}"],
     capture_output=True,
     text=True
 )
