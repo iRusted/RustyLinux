@@ -1,7 +1,8 @@
 import sqlite3 
 import datetime
+from pathlib import Path
 
-DATABASE = "RSL_PROD.db"
+DATABASE = Path(__file__).resolve().with_name("RSL_PROD.db")
 
 
 # =====================================================
@@ -13,6 +14,23 @@ def get_database_connection():
     connection.execute("PRAGMA busy_timeout = 10000")
     connection.execute("PRAGMA journal_mode = WAL")
     return connection
+
+def check_config():
+    db = get_database_connection()
+    
+    try:
+           cursor = db.cursor()
+   
+           cursor.execute("""
+               SELECT register_open
+               FROM config
+           """)
+   
+           result = cursor.fetchone()
+           return result[0] if result else None 
+       
+    finally:
+        db.close()
 
 def add_user(discord_id, username):
     db = get_database_connection()
@@ -28,8 +46,9 @@ def add_user(discord_id, username):
         db.commit()
         return cursor.lastrowid
 
-    except sqlite3.IntegrityError:
+    except sqlite3.IntegrityError as error:
         db.rollback()
+        print(f"[DATABASE ERROR] {error}")
         return None
 
     finally:
