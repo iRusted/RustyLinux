@@ -1,20 +1,19 @@
-from database.database_handler import add_user, get_user
+from core.usermanager import create_linux_user
+from database.database_handler import add_user
 
-def create_user(username, discord_id):
+def create_account(discord_id, discord_username):
+    linux_user = create_linux_user(discord_username)
 
-    existing_user = get_user(discord_id)
+    if not linux_user["success"]:
+        return "Linux account creation failed."
 
-    if existing_user is not None:
-        return "Account Already Created"
+    user_id = add_user(
+        discord_id,
+        linux_user["username"],
+        linux_user["home_dir"]
+    )
 
-    try:
-        user_id = add_user(discord_id, username)
+    if user_id is None:
+        return "Database registration failed."
 
-        if user_id is None:
-            return "Account Creation Failed"
-
-    except Exception as error:
-        print(f"Failed to create user: {error}")
-        return "Account Creation Failed"
-
-    return "Account Created"
+    return "Account created successfully."
