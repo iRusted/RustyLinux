@@ -1,7 +1,5 @@
-
 import discord
 from discord import app_commands
-from bot_config import bot
 
 import traceback
 import io
@@ -10,8 +8,7 @@ import io
 # =====================================================
 # APPLICATION COMMAND ERROR HANDLING
 # =====================================================
-
-@bot.tree.error
+    
 async def on_app_command_error(
     interaction: discord.Interaction,
     error: app_commands.AppCommandError
