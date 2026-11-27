@@ -11,7 +11,10 @@ HOME_BASE = Path("/home") if SYSTEM == "Linux" else Path("C:/Users")
 
 
 def validate_username(username: str) -> str | None:
-    """Normalize and validate a username."""
+    """Normalize and validate a Linux username."""
+
+    if not isinstance(username, str) or not username.strip():
+        return None
 
     username = username.lower()
     username = re.sub(r"[^a-z0-9_-]", "", username)
@@ -21,6 +24,8 @@ def validate_username(username: str) -> str | None:
 
     if not username[0].isalpha() and username[0] != "_":
         username = f"user_{username}"
+
+    return username[:24]
 
     return username[:24]
 
