@@ -1,5 +1,6 @@
 
 import sqlite3
+import platform
 from pathlib import Path
 
 
@@ -239,6 +240,12 @@ def check_config():
 def set_registration_status(status: bool) -> bool:
     """Enable or disable registration."""
 
+    if not isinstance(status, (bool, int)):
+        return False
+
+    if status not in (0, 1, False, True):
+        return False
+
     db = get_database_connection()
 
     try:
@@ -269,8 +276,15 @@ def set_registration_status(status: bool) -> bool:
 def add_user(discord_id, username, home_dir=None):
     """Add a new RustyLinux application account."""
 
+    if discord_id is None or not str(discord_id).strip():
+        return None
+
+    if not isinstance(username, str) or not username.strip():
+        return None
+
     if home_dir is None:
-        home_dir = str(Path("/home") / username)
+        home_base = Path("/home") if platform.system() == "Linux" else Path("C:/Users")
+        home_dir = str(home_base / username)
 
     db = get_database_connection()
 

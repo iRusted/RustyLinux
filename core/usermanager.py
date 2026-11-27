@@ -16,7 +16,7 @@ def validate_username(username: str) -> str | None:
     if not isinstance(username, str) or not username.strip():
         return None
 
-    username = username.lower()
+    username = username.strip().lower()
     username = re.sub(r"[^a-z0-9_-]", "", username)
 
     if not username:
@@ -24,8 +24,6 @@ def validate_username(username: str) -> str | None:
 
     if not username[0].isalpha() and username[0] != "_":
         username = f"user_{username}"
-
-    return username[:24]
 
     return username[:24]
 
@@ -103,6 +101,7 @@ def create_linux_user(username: str) -> dict:
             ],
             capture_output=True,
             text=True,
+            timeout=30,
             check=True
         )
 
@@ -113,9 +112,15 @@ def create_linux_user(username: str) -> dict:
         }
 
     except subprocess.CalledProcessError as error:
+        error_text = error.stderr.strip() if error.stderr else str(error)
         return {
             "success": False,
-            "error": error.stderr.strip()
+            "error": error_text
+        }
+    except (OSError, subprocess.TimeoutExpired) as error:
+        return {
+            "success": False,
+            "error": str(error)
         }
 
 
@@ -128,7 +133,13 @@ def create_windows_user(username: str) -> dict:
             "error": "Windows account creation is unavailable on this OS."
         }
 
-    import win32net
+    try:
+        import win32net
+    except ImportError as error:
+        return {
+            "success": False,
+            "error": str(error)
+        }
 
     available_username = get_available_username(username)
 

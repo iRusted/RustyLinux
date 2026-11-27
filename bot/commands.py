@@ -35,27 +35,30 @@ async def new_user(interaction: discord.Interaction):
     
     register_status = check_config()
     
-    if register_status == 0:
+    if register_status != 1:
         await interaction.followup.send(
             "Registrations are closed! Please come again later. Check the Discord Server for Updates"
         )
         return None     
 
     username = interaction.user.name
-    discord_id = interaction.user.id 
+    discord_id = interaction.user.id
     
-    result = create_account(username, discord_id)
-    
-    if result == "Account Created":
+    result = create_account(discord_id, username)
+
+    if result == "Account created successfully.":
         await interaction.followup.send(
             f"Account has been created for <@{discord_id}>"
         )
-    elif result == "Account Creation Failed":
+    elif result == "Account creation failed.":
         await interaction.followup.send(
             f"Account Creation Failed! Contact the Developer!"
         )
-    elif result == "Account Already Created":
+    elif result == "Account already created.":
         await interaction.followup.send(
             f"Account Already Created for <@{discord_id}>"
         )
-    
+    elif result == "Database registration failed.":
+        await interaction.followup.send(
+            "Account was created, but database registration failed! Contact the Developer!"
+        )
