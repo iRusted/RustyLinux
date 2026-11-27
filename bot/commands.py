@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from core.executor import run_command
 from bot.bot_config import bot
-from accounts.create_account import create_user
+from accounts.create_account import create_account
 from database.database_handler import check_config
 intents = discord.Intents.default()
 intents.message_content = True
@@ -44,7 +44,7 @@ async def new_user(interaction: discord.Interaction):
     username = interaction.user.name
     discord_id = interaction.user.id 
     
-    result = create_user(username, discord_id)
+    result = create_account(username, discord_id)
     
     if result == "Account Created":
         await interaction.followup.send(
