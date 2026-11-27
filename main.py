@@ -3,8 +3,20 @@ from bot.bot_config import bot, token
 from bot.error_handler import on_app_command_error
 from bot.commands import run_command_test, ping, new_user
 from core.executor import run_command
+from database.database_handler import check_database
 
 bot.tree.on_error = on_app_command_error
+
+db_status = check_database()
+
+if not db_status["success"]:
+    raise RuntimeError(
+        f"Database initialization failed: {db_status['errors']}"
+    )
+
+print("[DATABASE] Initialized successfully.")
+print(f"[DATABASE] Created tables: {db_status['created_tables']}")
+print(f"[DATABASE] Created columns: {db_status['created_columns']}")
 
 
 @bot.tree.command(
